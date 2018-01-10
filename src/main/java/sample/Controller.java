@@ -11,6 +11,7 @@ import sample.Client.Client;
 import sample.Interfaces.CallBackInterface;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable, CallBackInterface {
@@ -23,11 +24,14 @@ public class Controller implements Initializable, CallBackInterface {
     private RadioButton radioButtonJSON;
     @FXML
     private RadioButton radioButtonDefault;
+    @FXML
+    private TextField textField;
 
     final ToggleGroup group = new ToggleGroup();
 
     public Client client;
-    public String dataType="DEFAULT";
+    public String dataType = "DEFAULT";
+    public String userData="";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -37,7 +41,14 @@ public class Controller implements Initializable, CallBackInterface {
         radioButtonDefault.setUserData("DEFAULT");
         radioButtonDefault.setSelected(true);
 
-        client = new Client(this, dataType);
+        userData = textField.getText();
+
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("textfield changed from " + oldValue + " to " + newValue);
+            userData = newValue;
+        });
+
+        client = new Client(this, dataType, null);
 
         group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> ov,
@@ -50,13 +61,26 @@ public class Controller implements Initializable, CallBackInterface {
             }
         });
 
-        System.out.println("ok");
+        System.out.println(Arrays.toString(stringToArray(textField.getText())));
     }
 
 
     @FXML
     private void handleButtonAction1(ActionEvent event) {
-        new Thread(client).start();
+
+        if(userData.equals("")){
+            System.out.println("random mode");
+            client.setUserData("");
+            new Thread(client).start();
+        }else if(userData.length()>0 && Character.isDigit(userData.charAt(userData.length()-1))){
+            System.out.println("user mode");
+            client.setUserData(userData);
+            new Thread(client).start();
+        }else{
+            System.out.println("BAD ARRAY FORMAT");
+            listView.getItems().add("BAD ARRAY FORMAT");
+            listView.scrollTo(listView.getItems().size() - 1);
+        }
     }
 
     @Override
@@ -65,5 +89,15 @@ public class Controller implements Initializable, CallBackInterface {
             listView.getItems().add(val);
             listView.scrollTo(listView.getItems().size() - 1);
         });
+    }
+
+    public static int[] stringToArray(String s) {
+        String[] integerStrings = s.split(",");
+        int[] integers = new int[integerStrings.length];
+        for (int i = 0; i < integers.length; i++) {
+            integers[i] = Integer.parseInt(integerStrings[i]);
+
+        }
+        return integers;
     }
 }

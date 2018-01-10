@@ -78,17 +78,17 @@ public class RemoteObject extends UnicastRemoteObject implements StringOperation
     }
 
     public static String median(int[] tab) throws RemoteException {
-        double mediana;
-        double srednia;
+        double median;
+        double avg;
         Arrays.sort(tab);
 
         if (tab.length % 2 == 0) {
-            srednia = tab[tab.length / 2] + tab[(tab.length / 2) - 1];
-            mediana = srednia / 2.0;
+            avg = tab[tab.length / 2] + tab[(tab.length / 2) - 1];
+            median = avg / 2.0;
         } else {
-            mediana = tab[tab.length / 2];
+            median = tab[tab.length / 2];
         }
 
-        return Double.toString(mediana);
+        return Double.toString(median);
     }
 }
